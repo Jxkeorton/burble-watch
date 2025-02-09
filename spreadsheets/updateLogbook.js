@@ -32,7 +32,7 @@ class SkydiveLogUpdater {
 
             const values = response.data.values || [];
             if (values.length === 0) {
-                return 0; // Start from 1 if no existing entries
+                return 0;
             }
 
             // Get the last value
@@ -91,7 +91,6 @@ class SkydiveLogUpdater {
     }
 }
 
-// Example usage:
 async function main() {
     const updater = new SkydiveLogUpdater();
     await updater.init();
