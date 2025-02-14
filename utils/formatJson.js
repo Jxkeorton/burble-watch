@@ -20,6 +20,8 @@ export const formatData = (loadData, canopy, DZID, description) => {
 
     if (DZID === 531 ){
         DZ = 'Skydive Langar';
+    } else {
+        DZ = DZID.stringify();
     }
 
     const date = convertTimestampToDateString(loadData.expected_take_off);
