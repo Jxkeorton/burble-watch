@@ -1,12 +1,14 @@
 const puppeteer = require('puppeteer');
 const { checkName, formatData } = require('./utils/formatJson');
-const { SkydiveLogUpdater } = require('./SkydiveLogUpdater');
+const { updateLogbook } = require('./spreadsheets/updateLogbook');
+require('dotenv').config();
 
-// Configure jumps
-const jumpersName = 'Jake Orton'
-const canopy = 'Sabre 1 150';
-const DZID = 531;
-const description = '';
+// Configure variables
+const jumpersName = process.env.JUMPERS_NAME;
+const canopy = process.env.CANOPY;
+const DZID = process.env.DZ_ID;
+const description = process.env.DESCRIPTION; 
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID; // within the url of google sheet
 
 const todaysLoads = [];
 
@@ -15,9 +17,6 @@ async function monitorAjaxTraffic() {
         headless: false,
         args: ['--no-sandbox']
     });
-
-    const updater = new SkydiveLogUpdater;
-    await updater.init();
     
     const page = await browser.newPage();
     await page.setRequestInterception(true);
@@ -36,8 +35,11 @@ async function monitorAjaxTraffic() {
                     const newJump = formatData(jsonData, canopy, DZID, description);
                     todaysLoads.push(loadData.id);
 
+                    // if camera update camera invoice
+
+                    // update logbook with new jump
                     try {
-                        await updater.appendJump(SPREADSHEET_ID, newJump);
+                        await updateLogbook(SPREADSHEET_ID, newJump);
                         console.log('Jump added to spreadsheet successfully');
                     } catch (error) {
                         console.error('Error adding jump to spreadsheet:', error);
