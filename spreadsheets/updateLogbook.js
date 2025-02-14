@@ -91,20 +91,11 @@ class SkydiveLogUpdater {
     }
 }
 
-async function main() {
+async function main(newJump) {
     const updater = new SkydiveLogUpdater();
     await updater.init();
 
     const SPREADSHEET_ID = '1zDM0rkzke54iwCCN-cBzJpCPh38uTLOv2xo3Nktou-0';
-    
-    const newJump = {
-        date: '2025-02-25', 
-        dz: 'Skydive Langar',
-        planeName: 'G-FBPS 1',
-        jumpType: 'camera',
-        canopy: 'Sabre 1 150',
-        description: ''
-    };
 
     await updater.appendJump(SPREADSHEET_ID, newJump);
 }
