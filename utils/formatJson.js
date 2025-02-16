@@ -2,12 +2,23 @@ const convertTimestampToDateString = (timestamp) => {
     return new Date(timestamp * 1000).toISOString().split('T')[0];
 }
 
-export const checkName = (name, loads) => {
+const checkName = (name, loads) => {
     for (let load of loads) {
-        if (load.time_left < 0){
+        // Skip empty loads
+        if (!load.groups) continue;
+        
+        // Check if load still has time left
+        if (load.time_left > 0) {
+            // Iterate through each group in the load
             for (let group of load.groups) {
-                if (group.name === name) {
-                    return load;
+                // Iterate through each jumper in the group
+                for (let jumper of group) {
+                    if (jumper.name === name) {
+
+                        const jumpType = jumper.type
+
+                        return {loadData: load, jumpType};
+                    }
                 }
             }
         }
@@ -15,23 +26,24 @@ export const checkName = (name, loads) => {
     return null;
 };
 
-export const formatData = (loadData, canopy, DZID, description) => {
-    const DZ = ''
+const formatData = (loadData, canopy, DZID, description, jumpType) => {
+    let dz = ''
 
-    if (DZID === 531 ){
-        DZ = 'Skydive Langar';
+    console.log(DZID)
+
+    if (DZID == 531 ){
+        dz = 'Skydive Langar';
     } else {
-        DZ = DZID.stringify();
+        dz = DZID.toString();
     }
 
     const date = convertTimestampToDateString(loadData.expected_take_off);
-    const PlaneName = loadData.name;
-    const jumpType = loadData.groups[0].type;
+    const planeName = loadData.name;
 
     const newJump = {
         date,
-        DZ,
-        PlaneName,
+        dz,
+        planeName,
         jumpType,
         canopy,
         description
@@ -39,3 +51,5 @@ export const formatData = (loadData, canopy, DZID, description) => {
 
     return newJump;
 };
+
+module.exports = { checkName, formatData};
