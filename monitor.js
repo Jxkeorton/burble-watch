@@ -3,7 +3,7 @@ const { checkName, formatData } = require('./utils/formatJson');
 const { updateLogbook } = require('./spreadsheets/updateLogbook');
 require('dotenv').config();
 
-// TODO: Add check for camera flying jump - check logbook updater works after update - switch to functional programming - check against mock data
+// TODO: Add check for camera flying jump - switch to functional programming 
 
 // Configure variables
 const jumpersName = process.env.JUMPERS_NAME;

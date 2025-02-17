@@ -8,7 +8,7 @@ const checkName = (name, loads) => {
         if (!load.groups) continue;
         
         // Check if load still has time left
-        if (load.time_left > 0) {
+        if (load.time_left < 0) {
             // Iterate through each group in the load
             for (let group of load.groups) {
                 // Iterate through each jumper in the group
