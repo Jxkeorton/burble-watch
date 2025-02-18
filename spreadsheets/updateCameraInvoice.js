@@ -1,6 +1,12 @@
 const {initGoogleSheets} = require('../utils/initGoogleSheets')
 
 async function readSheet(spreadsheetId, range, sheets) {
+
+    if (!sheets) {
+        console.error("Google Sheets API client is not initialized.");
+        return null;
+    }
+
     try {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
@@ -30,7 +36,8 @@ async function updateSheet(spreadsheetId, range, values, sheets) {
 }
 
 function getCurrentSunday() {
-    const today = new Date();
+    // const today = new Date();
+    const today = new Date(2025, 2, 10)
     const currentDay = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
     
     // Get next Sunday if today isn't Sunday
@@ -90,8 +97,8 @@ async function findAndUpdateCell(sheets, spreadsheetId, valueToAdd) {
         await updateSheet(
             spreadsheetId,
             range,
+            [[newValue.toString()]], // Fix: Move sheets outside, and format array correctly
             sheets
-            [[newValue.toString()]]
         );
 
         console.log(`Updated value from ${currentValue} to ${newValue}`);
@@ -104,7 +111,8 @@ async function findAndUpdateCell(sheets, spreadsheetId, valueToAdd) {
 
 async function updateCameraInvoice(spreadsheetId, valueToAdd) {
     // Initialize updater
-    const sheets = initGoogleSheets();
+    const sheets = await initGoogleSheets();
+    console.log("Sheets instance:", sheets);
     
     // Find and update the correct cell
     await findAndUpdateCell(

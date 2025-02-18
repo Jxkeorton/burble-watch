@@ -52,4 +52,30 @@ const formatData = (loadData, canopy, DZID, description, jumpType) => {
     return newJump;
 };
 
-module.exports = { checkName, formatData};
+function countCameraFlying() {
+    return todaysLoads.reduce((count, load) => {
+        return load.cameraFlying === true ? count + 1 : count;
+    }, 0);
+}
+
+const processJumpData = (responseData, config) => {
+    const { loadData, jumpType } = checkName(config.jumpersName, responseData.loads);
+    
+    if (!loadData) {
+        return null;
+    }
+
+    return {
+        jump: formatData(
+            loadData, 
+            config.canopy, 
+            config.dzId, 
+            config.description, 
+            jumpType
+        ),
+        loadId: loadData.id,
+        isCamera: jumpType === 'Camera'
+    };
+};
+
+module.exports = { countCameraFlying, processJumpData};
