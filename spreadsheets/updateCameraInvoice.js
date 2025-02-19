@@ -1,7 +1,6 @@
-const {initGoogleSheets} = require('../utils/initGoogleSheets')
+import { initGoogleSheets } from '../utils/initGoogleSheets.js';
 
 async function readSheet(spreadsheetId, range, sheets) {
-
     if (!sheets) {
         console.error("Google Sheets API client is not initialized.");
         return null;
@@ -21,13 +20,12 @@ async function readSheet(spreadsheetId, range, sheets) {
 
 async function updateSheet(spreadsheetId, range, values, sheets) {
     try {
-        const response = await sheets.spreadsheets.values.update({
+        await sheets.spreadsheets.values.update({
             spreadsheetId,
             range,
             valueInputOption: 'USER_ENTERED',
             requestBody: { values }
         });
-        console.log(`Updated ${response.data.updatedCells} cells at ${range}`);
         return true;
     } catch (error) {
         console.error('Error updating sheet:', error.message);
@@ -37,7 +35,7 @@ async function updateSheet(spreadsheetId, range, values, sheets) {
 
 function getCurrentSunday() {
     // const today = new Date();
-    const today = new Date(2025, 2, 10)
+    const today = new Date(2025, 2, 10);
     const currentDay = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
     
     // Get next Sunday if today isn't Sunday
@@ -82,7 +80,7 @@ async function findAndUpdateCell(sheets, spreadsheetId, valueToAdd) {
         }
 
         if (targetRow === -1) {
-            console.log('Target Sunday not found in sheet');
+            console.error('Target Sunday not found in sheet');
             return false;
         }
 
@@ -112,7 +110,6 @@ async function findAndUpdateCell(sheets, spreadsheetId, valueToAdd) {
 async function updateCameraInvoice(spreadsheetId, valueToAdd) {
     // Initialize updater
     const sheets = await initGoogleSheets();
-    console.log("Sheets instance:", sheets);
     
     // Find and update the correct cell
     await findAndUpdateCell(
@@ -122,4 +119,4 @@ async function updateCameraInvoice(spreadsheetId, valueToAdd) {
     );
 }
 
-module.exports = { updateCameraInvoice }
+export { updateCameraInvoice };

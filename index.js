@@ -1,6 +1,6 @@
-const { monitorAjaxTraffic } = require('./monitor'); // Import the script
+import { monitorAjaxTraffic } from './utils/monitor.js'; // Note the .js extension
 
-(async () => {
+const main = async () => {
     try {
         const stateEmitter = await monitorAjaxTraffic();
 
@@ -15,4 +15,6 @@ const { monitorAjaxTraffic } = require('./monitor'); // Import the script
     } catch (error) {
         console.error('Error starting monitoring:', error);
     }
-})();
+};
+
+main();

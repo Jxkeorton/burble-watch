@@ -1,6 +1,6 @@
 const convertTimestampToDateString = (timestamp) => {
     return new Date(timestamp * 1000).toISOString().split('T')[0];
-}
+};
 
 const checkName = (name, loads) => {
     for (let load of loads) {
@@ -14,10 +14,8 @@ const checkName = (name, loads) => {
                 // Iterate through each jumper in the group
                 for (let jumper of group) {
                     if (jumper.name === name) {
-
-                        const jumpType = jumper.type
-
-                        return {loadData: load, jumpType};
+                        const jumpType = jumper.type;
+                        return { loadData: load, jumpType };
                     }
                 }
             }
@@ -27,11 +25,9 @@ const checkName = (name, loads) => {
 };
 
 const formatData = (loadData, canopy, DZID, description, jumpType) => {
-    let dz = ''
+    let dz = '';
 
-    console.log(DZID)
-
-    if (DZID == 531 ){
+    if (DZID == 531) {
         dz = 'Skydive Langar';
     } else {
         dz = DZID.toString();
@@ -47,23 +43,20 @@ const formatData = (loadData, canopy, DZID, description, jumpType) => {
         jumpType,
         canopy,
         description
-    }
+    };
 
     return newJump;
 };
 
-function countCameraFlying() {
-    return todaysLoads.reduce((count, load) => {
-        return load.cameraFlying === true ? count + 1 : count;
-    }, 0);
-}
-
 const processJumpData = (responseData, config) => {
-    const { loadData, jumpType } = checkName(config.jumpersName, responseData.loads);
-    
-    if (!loadData) {
+    const loads = Array.isArray(responseData.loads) ? responseData.loads : [];
+    const result = checkName(config.jumpersName, loads);
+
+    if (!result) {
         return null;
     }
+
+    const { loadData, jumpType } = result;
 
     return {
         jump: formatData(
@@ -78,4 +71,4 @@ const processJumpData = (responseData, config) => {
     };
 };
 
-module.exports = { countCameraFlying, processJumpData};
+export { processJumpData };

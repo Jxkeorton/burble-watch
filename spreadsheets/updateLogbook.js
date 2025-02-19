@@ -1,15 +1,7 @@
-const { initGoogleSheets } = require('../utils/initGoogleSheets')
+import { initGoogleSheets } from '../utils/initGoogleSheets.js';
 
 async function getLastJumpNumber(sheets, spreadsheetId) {
     try {
-        // Get the sheet metadata first to confirm sheet name
-        const spreadsheet = await sheets.spreadsheets.get({
-            spreadsheetId
-        });
-
-        // Log available sheet names for debugging
-        console.log("Available sheets:", spreadsheet.data.sheets.map(sheet => sheet.properties.title));
-
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range: "'Logbook'!D2:D",  // Added quotes around sheet name
@@ -88,4 +80,4 @@ async function updateLogbook(newJump, spreadsheetId) {
     }
 }
 
-module.exports = { updateLogbook };
+export { updateLogbook };

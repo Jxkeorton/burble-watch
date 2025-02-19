@@ -1,13 +1,8 @@
-const {updateCameraInvoice} = require('../spreadsheets/updateCameraInvoice')
+import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
 
-async function shutdown(spreadsheetId, valueToAdd) {
+export async function shutdown(spreadsheetId, valueToAdd) {
     console.log('Initiating shutdown...');
     try {
-        if (browser) {
-            console.log('Closing browser...');
-            await browser.close();
-        }
-        
         // Log the shutdown status to Google Sheets
         await updateCameraInvoice(spreadsheetId, valueToAdd);
         
@@ -17,5 +12,3 @@ async function shutdown(spreadsheetId, valueToAdd) {
     }
     process.exit(0);
 }
-
-module.exports = {shutdown};
