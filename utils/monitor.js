@@ -115,7 +115,6 @@ export const monitorAjaxTraffic = async () => {
         await browser.close();
     };
 
-    // Add SIGINT handling
     if (process.platform === "win32") {
         // Workaround for Windows to ensure SIGINT is caught correctly
         const rl = readline.createInterface({
@@ -135,8 +134,27 @@ export const monitorAjaxTraffic = async () => {
         process.exit(0); 
     });
 
+    process.on('message', async (msg) => {
+        if(msg === 'shutdown'){
+            console.log( 'Shutting down...');
+            await shutdownHandler();
+            console.log('Exiting now...');
+
+            setTimeout(function() {
+                process.exit(0)
+              }, 1500)
+        }
+    })
+
     process.on('SIGTERM', async () => {
         console.log( 'SIGTERM Shutting down...');
+        await shutdownHandler();
+        console.log('Exiting now...');
+        process.exit(0);
+    });
+
+    process.on('SIGBREAK', async () => {
+        console.log( 'SIGBREAK Shutting down...');
         await shutdownHandler();
         console.log('Exiting now...');
         process.exit(0);
