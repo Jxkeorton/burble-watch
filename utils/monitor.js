@@ -141,12 +141,13 @@ export const monitorAjaxTraffic = async () => {
         console.log('Exiting now...');
         process.exit(0);
     });
-    
+
     process.on('uncaughtException', async (error) => {
         console.error('Uncaught Exception:', error);
         await shutdownHandler();
         process.exit(0);
     });
+    
     process.on('unhandledRejection', async (reason, promise) => {
         console.error('Unhandled Rejection at:', promise, 'reason:', reason);
         await shutdownHandler();

@@ -1,9 +1,9 @@
 # Instructions for reuse
-Running this script will monitor burble, once your name appears on a load it will update your logbook and there is also functionality to update my camera invoice so delete it if you dont need it.
+Running this script will monitor burble, once your name appears on a load it will update your logbook, there is also functionality to update my camera invoice so delete it if you dont need it.
 
 ## Step 1 
 - Pull code from repo
-- Change the name parameter within monitor.js
+- Use config within monitor.js to create .env file 
 
 ## Step 2 - Google cloud console
 - Create google cloud console project 
@@ -12,10 +12,12 @@ Running this script will monitor burble, once your name appears on a load it wil
 - Export the credentials.json
 
 ## Step 3 
-- Add the credentials.json within the spreadsheets directory
+- Add the credentials.json within the spreadsheets directory and copy/paste to the root directory
+(cba to understand why, this project already took too much time)
 
 ## Step 4
-- Change the spreadsheet ID for your google sheets (within the url of the google sheet you want to edit)
+- Add Spreadsheet ID to .env file
+- Share google sheet with service account
 
 ## Step 5
 - Have correct logbook layout:
@@ -30,4 +32,4 @@ Running this script will monitor burble, once your name appears on a load it wil
 </details>
 
 ## Step 6 
-- Remove the if statement that checks for camera jumps in the monitor.js
+- Remove the shutdown method if not updating camera invoice 
