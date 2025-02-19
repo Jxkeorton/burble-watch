@@ -33,3 +33,30 @@ Running this script will monitor burble, once your name appears on a load it wil
 
 ## Step 6 
 - Remove the shutdown method if not updating camera invoice 
+
+
+## Run 
+
+node index.js
+
+## Run & schedule on a free oracle instance 
+
+- Set up an Oracle cloud account 
+- navigate compute > instances > create new instance
+- Image: Canocial Ubuntu 22.04
+- Shape: VM.Standard.E2.1.Micro
+- Download private key and public key 
+- save in C:/Users/your user/.ssh/
+- Create instance
+- Use Docs to connect to linux instance
+- Once connected install node js , npm , git , pm2
+- pull github repo
+- cd into project 
+- nano .env (create env file)
+- npm install (install package.json)
+- pm2 start index.js --name callitwhatyouwant
+- check it runs
+- pm2 list
+- pm2 save 
+- pm2 stop
+- create crontab schedule
