@@ -34,8 +34,7 @@ async function updateSheet(spreadsheetId, range, values, sheets) {
 }
 
 function getCurrentSunday() {
-    // const today = new Date();
-    const today = new Date(2025, 2, 10);
+    const today = new Date();
     const currentDay = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
     
     // Get next Sunday if today isn't Sunday
