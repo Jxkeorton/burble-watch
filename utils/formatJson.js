@@ -14,7 +14,7 @@ const checkName = (name, loads) => {
                 // Iterate through each jumper in the group
                 for (let jumper of group) {
                     if (jumper.name === name) {
-                        const jumpType = jumper.type;
+                        const jumpType = jumper.jump;
                         return { loadData: load, jumpType };
                     }
                 }
@@ -67,7 +67,7 @@ const processJumpData = (responseData, config) => {
             jumpType
         ),
         loadId: loadData.id,
-        isCamera: jumpType === 'Camera'
+        isCamera: jumpType === 'VID'
     };
 };
 
