@@ -1,10 +1,10 @@
-import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
+import { updateMoneyEarnt } from '../spreadsheets/updateMoneyEarnt.js';
 
 export async function shutdown(spreadsheetId, valueToAdd) {
     console.log('Initiating shutdown...');
     try {
         // Log the shutdown status to Google Sheets
-        await updateCameraInvoice(spreadsheetId, valueToAdd);
+        await updateMoneyEarnt(spreadsheetId, valueToAdd);
         
         console.log('Shutdown complete');
     } catch (error) {
