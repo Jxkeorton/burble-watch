@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { shutdown } from './shutdown.js';
 import { EventEmitter } from 'events';
 import readline from 'readline'; 
+import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ const createConfig = env => ({
     dzId: env.DZ_ID,
     description: env.DESCRIPTION,
     logbookSpreadsheetId: env.LOGBOOK_SPREADSHEET_ID,
+    moneyEarntSpreadsheetId: env.MONEY_EARNT_SPREADSHEET_ID,
     invoiceSpreadsheetId: env.INVOICE_SPREADSHEET_ID
 });
 
@@ -90,6 +92,15 @@ export const monitorAjaxTraffic = async () => {
             processedLoads = newState.processedLoads;
             cameraCount = newState.cameraCount;
 
+            if(jumpData.isCamera){
+                const cameraJumpInfo = {
+                    date: new Date(),
+                    studentName: jumpData.studentName
+                }
+
+                updateCameraInvoice(cameraJumpInfo, invoiceSpreadsheetId)
+            }
+
             // Delay processing new responses for 60 seconds
             await new Promise(resolve => setTimeout(resolve, 60000));
 
@@ -111,7 +122,7 @@ export const monitorAjaxTraffic = async () => {
             console.log('No camera jumps to add')
             return
         }
-        await shutdown(config.invoiceSpreadsheetId, cameraCount);
+        await shutdown(config.moneyEarntSpreadsheetId, cameraCount);
         await browser.close();
     };
 

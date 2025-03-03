@@ -239,24 +239,3 @@ export async function updateCameraInvoice(cameraJumpInfo, spreadsheetId) {
     };
   }
 }
-
-async function testInvoiceUpdate() {
-    const spreadsheetId = '16gVb5zEW8iMGOimouAK1OQjiCXHCsH-yeaijkWWeiOQ';
-    
-    // Sample camera jump data for testing
-    const cameraJumpInfo = {
-        date: "2025-03-02",
-        studentName: "Joseph tuffin",
-      }
-  
-    try {
-      console.log("Starting test...");
-      const result = await updateCameraInvoice(cameraJumpInfo, spreadsheetId);
-      console.log("Test result:", result);
-    } catch (error) {
-      console.error("Test failed:", error);
-    }
-}
-
-// Run the test
-testInvoiceUpdate();
