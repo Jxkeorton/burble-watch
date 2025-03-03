@@ -145,32 +145,47 @@ async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
       const existingData = dataResponse.data.values || [];
       
       // Find the row where we need to add data (after the last entry)
-      let lastRowIndex = 15; // Default starting row (based on your template screenshot)
+      let lastRowIndex = 18; // Default starting row (based on your template screenshot)
       
-      // Find the last row with data in the customer column
-      for (let i = 15; i < existingData.length; i++) {
-        if (existingData[i] && existingData[i][3]) { // Column D (index 3) is CUSTOMER
+      // Find the last row with data in the student name column (now column C, index 2)
+      for (let i = 18; i < existingData.length; i++) {
+        if (existingData[i] && existingData[i][2]) { // Column C (index 2) is CUSTOMER/Student Name
           lastRowIndex = i + 1;
         }
       }
       
+      // Find the last NO. value to determine the next one
+      let lastNoValue = createNewSheet ? 0 : 1; // Start with 1 if no previous entries
+      
+      // Scan through existing data to find the highest NO. value
+      for (let i = 15; i < existingData.length; i++) {
+        if (existingData[i] && existingData[i][0]) { // Column A (index 0) is NO.
+          const noValue = parseInt(existingData[i][0]);
+          if (!isNaN(noValue) && noValue >= lastNoValue) {
+            lastNoValue = noValue;
+          }
+        }
+      }
+      
+      // Increment the NO. value for the new entry
+      const nextNoValue = lastNoValue + 1;
+      
       // Prepare updates for each camera jump
       const updates = [];
       
-      cameraJumpInfo.forEach((jump, index) => {
-        const rowIndex = lastRowIndex + index;
-        
-        // Format the date as DD/MM/YYYY
-        const jumpDate = new Date(jump.date);
-        const formattedDate = `${jumpDate.getDate()}/${jumpDate.getMonth() + 1}/${jumpDate.getFullYear()}`;
-        
-        // Prepare the row update
-        updates.push({
-          range: `${targetSheetTitle}!A${rowIndex}:D${rowIndex}`,
-          values: [
-            [index + 1, formattedDate, "", jump.studentName] // NO., DATE, empty column, CUSTOMER
-          ]
-        });
+      const rowIndex = lastRowIndex + 1;
+      
+      // Format the date as DD/MM/YYYY
+      const jumpDate = new Date(cameraJumpInfo.date);
+      const formattedDate = `${jumpDate.getDate()}/${jumpDate.getMonth() + 1}/${jumpDate.getFullYear()}`;
+      
+      // Prepare the row update with incremented NO. value
+      // Set values directly in columns A, B, and C (NO., DATE, STUDENT NAME)
+      updates.push({
+        range: `${targetSheetTitle}!A${rowIndex}:C${rowIndex}`,
+        values: [
+          [nextNoValue, formattedDate, cameraJumpInfo.studentName] // NO., DATE, CUSTOMER
+        ]
       });
       
       // Apply the updates
@@ -188,9 +203,10 @@ async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
         success: true,
         sheetStatus: createNewSheet ? 'created' : 'updated',
         sheetTitle: targetSheetTitle,
+        noValue: nextNoValue,
         message: createNewSheet 
-          ? `Created new invoice sheet "${targetSheetTitle}" and added ${cameraJumpInfo.length} camera jumps` 
-          : `Updated ${cameraJumpInfo.length} camera jumps in existing sheet "${targetSheetTitle}"`
+          ? `Created new invoice sheet "${targetSheetTitle}" and added entry with NO. ${nextNoValue}` 
+          : `Updated invoice in existing sheet "${targetSheetTitle}" with NO. ${nextNoValue}`
       };
       
     } catch (error) {
@@ -228,16 +244,10 @@ async function testInvoiceUpdate() {
     const spreadsheetId = '16gVb5zEW8iMGOimouAK1OQjiCXHCsH-yeaijkWWeiOQ';
     
     // Sample camera jump data for testing
-    const cameraJumpInfo = [
-      {
+    const cameraJumpInfo = {
         date: "2025-03-02",
-        studentName: "John Doe",
-      },
-      {
-        date: "2025-03-02", 
-        studentName: "Jane Smith",
+        studentName: "Joseph tuffin",
       }
-    ];
   
     try {
       console.log("Starting test...");
