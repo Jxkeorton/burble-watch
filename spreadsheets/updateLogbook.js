@@ -60,8 +60,7 @@ async function appendJump(sheets, spreadsheetId, data) {
             }
         };
 
-        const result = await sheets.spreadsheets.values.append(request);
-        console.log('Append successful:', result.data);
+        await sheets.spreadsheets.values.append(request);
         return true;
     } catch (error) {
         console.error('Error appending to sheet:', error.message);

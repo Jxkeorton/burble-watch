@@ -1,4 +1,4 @@
-import { monitorAjaxTraffic } from './utils/monitor.js'; // Note the .js extension
+import { monitorAjaxTraffic } from './utils/monitor.js';
 
 const main = async () => {
     try {

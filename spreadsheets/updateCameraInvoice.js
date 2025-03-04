@@ -296,10 +296,3 @@ export async function updateCameraInvoice(cameraJumpInfo, spreadsheetId) {
     };
   }
 }
-
-const cameraJump = {
-  date: new Date(),
-  studentName: "jake"
-}
-
-updateCameraInvoice(cameraJump, "16gVb5zEW8iMGOimouAK1OQjiCXHCsH-yeaijkWWeiOQ")

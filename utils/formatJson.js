@@ -3,21 +3,20 @@ const convertTimestampToDateString = (timestamp) => {
 };
 
 const checkName = (name, loads) => {
-    let studentName = '';
-
     for (let load of loads) {
         // Skip empty loads
         if (!load.groups) continue;
         
         // Check if load still has time left
-        if (load.time_left < 1) {
+        if (load.time_left < 1) {            
             // Iterate through each group in the load
             for (let group of load.groups) {
                 // Iterate through each jumper in the group
-                for (let jumper of group) {
+                for (let jumper of group) {                    
                     if (jumper.name === name) {
                         const jumpType = jumper.jump;
 
+                        let studentName = '';
                         if(jumpType === 'VID'){
                             studentName = group[0].name;
                         }

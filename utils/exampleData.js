@@ -22,7 +22,7 @@ const jsonData = {
                     "is_fueling": "0",
                     "aircraft_name": "",
                     "caculate_expected_take_off": "1739541600",
-                    "time_left": 19,
+                    "time_left": 0,
                     "groups": [
                         [
                             {
@@ -49,6 +49,26 @@ const jsonData = {
                                 "id": "5122952",
                                 "jump": "TAN",
                                 "name": "Kayleigh Garbett",
+                                "tribe": "",
+                                "is_public": "0",
+                                "is_private": "1",
+                                "transaction_type_id": "3",
+                                "type": "Tandem",
+                                "option_name": "",
+                                "formation_type_id": "0",
+                                "rig_id": "0",
+                                "team_id": "0",
+                                "sale_id": "1833062",
+                                "team_name": "",
+                                "formation_type_name": "",
+                                "rig_name": "",
+                                "handycam_jump": "",
+                                "group_number": "4-1"
+                            },
+                            {
+                                "id": "5122953",
+                                "jump": "VID",
+                                "name": "Jake Orton",
                                 "tribe": "",
                                 "is_public": "0",
                                 "is_private": "1",
@@ -448,4 +468,4 @@ const jsonData = {
             "operation_time": "27.125835418701ms"
 };
 
-module.exports = {jsonData};
+export default jsonData;

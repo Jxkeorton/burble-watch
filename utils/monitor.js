@@ -24,7 +24,7 @@ const createConfig = env => ({
 });
 
 // Side effect: Handle new jump detection
-const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => async (jumpData) => {
+export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => async (jumpData) => {
     if (!jumpData || processedLoads.has(jumpData.loadId)) {
         console.log('Loads processed, nothing to log')
         return { processedLoads, cameraCount };
@@ -38,6 +38,13 @@ const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => async (ju
         stateEmitter.emit('loadProcessed', jumpData.loadId);
         if (jumpData.isCamera) {
             stateEmitter.emit('cameraJumpAdded');
+
+            const cameraJumpInfo = {
+                date: new Date(),
+                studentName: jumpData.studentName
+            }
+
+            updateCameraInvoice(cameraJumpInfo, process.env.INVOICE_SPREADSHEET_ID)
         }
 
         return {
@@ -91,15 +98,6 @@ export const monitorAjaxTraffic = async () => {
             // Update state values
             processedLoads = newState.processedLoads;
             cameraCount = newState.cameraCount;
-
-            if(jumpData.isCamera){
-                const cameraJumpInfo = {
-                    date: new Date(),
-                    studentName: jumpData.studentName
-                }
-
-                updateCameraInvoice(cameraJumpInfo, invoiceSpreadsheetId)
-            }
 
             // Delay processing new responses for 60 seconds
             await new Promise(resolve => setTimeout(resolve, 60000));
