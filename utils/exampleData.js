@@ -1,3 +1,24 @@
+const formationTypeExample = {
+    formation_type_id: "6",
+    formation_type_name: "Tracking",
+    group_number: "",
+    handycam_jump: "",
+    id: "5193962",
+    is_private: "0",
+    is_public: "1",
+    jump: "STA",
+    name: "Jacek Roszak",
+    option_name: "",
+    rig_id: "0",
+    rig_name: "",
+    sale_id: "1862312",
+    team_id: "0",
+    team_name: "",
+    transaction_type_id: "1",
+    tribe: "",
+    type: "Sport Jumper"
+};
+
 const jsonData = {
             "queries": 6,
             "loads": [

@@ -26,7 +26,6 @@ const createConfig = env => ({
 // Side effect: Handle new jump detection
 export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => async (jumpData) => {
     if (!jumpData || processedLoads.has(jumpData.loadId)) {
-        console.log('Loads processed, nothing to log')
         return { processedLoads, cameraCount };
     }
 
