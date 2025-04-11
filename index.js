@@ -1,8 +1,8 @@
-import { monitorAjaxTraffic } from './utils/monitor.js';
+import { monitorBurble } from './utils/monitor.js';
 
 const main = async () => {
     try {
-        const stateEmitter = await monitorAjaxTraffic();
+        const stateEmitter = await monitorBurble();
 
         // Listen for processed jump updates
         stateEmitter.on('loadProcessed', (loadId) => {

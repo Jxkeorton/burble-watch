@@ -46,7 +46,7 @@ async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
     // Get existing data from the target sheet
     const dataResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
-      range: `${targetSheetTitle}!A1:H30`
+      range: `${targetSheetTitle}!A1:H400`
     });
     
     const existingData = dataResponse.data.values || [];

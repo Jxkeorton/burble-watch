@@ -34,7 +34,7 @@ const jsonData = {
                     {
                         "id": "5122712",
                         "jump": "TAN",
-                        "name": "Finn Styles",
+                        "name": "Test user",
                         "tribe": "",
                         "is_public": "0",
                         "is_private": "1",

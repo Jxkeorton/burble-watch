@@ -57,7 +57,7 @@ export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => as
 };
 
 // Main monitoring function
-export const monitorAjaxTraffic = async () => {
+export const monitorBurble = async () => {
     const config = createConfig(process.env);
     let processedLoads = new Set();
     let cameraCount = 0;
