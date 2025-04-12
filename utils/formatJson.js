@@ -7,18 +7,23 @@ const checkName = (name, loads) => {
         // Skip empty loads
         if (!load.groups) continue;
         
-        // Check if load still has time left
+        // Ensure time is less than 1 minute to avoid pointless log due to weather holds etc
         if (load.time_left < 1) {            
             // Iterate through each group in the load
             for (let group of load.groups) {
                 // Iterate through each jumper in the group
                 for (let jumper of group) {                    
                     if (jumper.name === name) {
-                        const jumpType = jumper.jump;
+                        let jumpType = jumper.jump;
+                        const sale_id = jumper.sale_id
 
                         let studentName = '';
                         if(jumpType === 'VID'){
-                            studentName = group[0].name;
+                            if (sale_id === group[0].sale_id){
+                                studentName = group[0].name;
+                            } else {
+                                jumpType = 'Camera'
+                            }
                         }
 
                         return { loadData: load, jumpType, studentName };
