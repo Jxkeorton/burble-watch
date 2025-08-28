@@ -64,20 +64,20 @@ export const monitorBurble = async () => {
     let processedLoads = new Set();
 
     const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: '/usr/bin/chromium-browser',
-    args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-gpu',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-background-timer-throttling'
-    ]
-});
-    
+        headless: true,
+        executablePath: '/usr/bin/chromium-browser',
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-background-timer-throttling'
+        ]
+    });
+        
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
@@ -85,6 +85,8 @@ export const monitorBurble = async () => {
 
     // Track when the last response was handled
     let isProcessing = false;
+
+    console.log('Monitoring started');
 
     page.on('response', async (response) => {
         if (!response.url().includes('ajax_dzm2_frontend_jumpermanifestpublic')) {
