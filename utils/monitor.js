@@ -64,20 +64,11 @@ export const monitorBurble = async () => {
     let processedLoads = new Set();
 
     const browser = await puppeteer.launch({
-        headless: true,
-        executablePath: '/usr/bin/chromium-browser',
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-background-timer-throttling'
-        ]
+            headless: true,
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-        
+
     const page = await browser.newPage();
     await page.setRequestInterception(true);
 
