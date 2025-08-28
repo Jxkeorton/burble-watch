@@ -1,4 +1,11 @@
+
 import { initGoogleSheets } from '../utils/initGoogleSheets.js';
+
+// Utility: Format date as DD/MM/YYYY
+function formatDate(date) {
+  const d = new Date(date);
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+}
 
 /**
  * Finds the appropriate sheet and updates it with new invoice information
@@ -8,79 +15,56 @@ import { initGoogleSheets } from '../utils/initGoogleSheets.js';
  * @returns {Object} Result of the operation
  */
 async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
-  try {
-    // Get all sheets in the spreadsheet
-    const response = await sheets.spreadsheets.get({
-      spreadsheetId: spreadsheetId,
-      fields: 'sheets.properties'
-    });
-    
-    const sheetsList = response.data.sheets;
-    
-    // Filter out the template sheet and sort sheets by index (newest first)
-    const monthSheets = sheetsList
-      .map(sheet => sheet.properties)
-      .filter(properties => properties.title !== 'Invoice Template')
-      .sort((a, b) => b.index - a.index);
-    
-    let targetSheetId;
-    let targetSheetTitle;
-    let createNewSheet = false;
-    
-    // Determine if we need a new invoice sheet
-    if (needsNewInvoice(monthSheets)) {
-      createNewSheet = true;
-    } else if (monthSheets.length > 0) {
-      // Use the most recent sheet
-      targetSheetId = monthSheets[0].sheetId;
-      targetSheetTitle = monthSheets[0].title;
-    }
-    
-    // Create a new sheet if needed
-    if (createNewSheet) {
-      const result = await createNewInvoiceSheet(sheets, sheetsList, spreadsheetId);
-      targetSheetId = result.sheetId;
-      targetSheetTitle = result.sheetTitle;
-    }
-    
-    // Get existing data from the target sheet
-    const dataResponse = await sheets.spreadsheets.values.get({
-      spreadsheetId: spreadsheetId,
-      range: `${targetSheetTitle}!A1:H400`
-    });
-    
-    const existingData = dataResponse.data.values || [];
-    
-    // Find the appropriate row and NO. value for the new entry
-    const { rowIndex, nextNoValue } = findNextRowAndNumber(existingData, createNewSheet);
-    
-    // Add the new entry to the sheet
-    await addEntryToSheet(
-      sheets, 
-      spreadsheetId, 
-      targetSheetTitle, 
-      rowIndex, 
-      nextNoValue, 
-      cameraJumpInfo
-    );
-    
-    return {
-      success: true,
-      sheetStatus: createNewSheet ? 'created' : 'updated',
-      sheetTitle: targetSheetTitle,
-      noValue: nextNoValue,
-      message: createNewSheet 
-        ? `Created new invoice sheet "${targetSheetTitle}" and added entry with NO. ${nextNoValue}` 
-        : `Updated invoice in existing sheet "${targetSheetTitle}" with NO. ${nextNoValue}`
-    };
-    
-  } catch (error) {
-    console.error('Error updating invoice:', error);
-    return {
-      success: false,
-      message: `Error updating invoice: ${error.message}`
-    };
+  // Get all sheets in the spreadsheet
+  const response = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: 'sheets.properties'
+  });
+  const sheetsList = response.data.sheets;
+  const monthSheets = sheetsList
+    .map(sheet => sheet.properties)
+    .filter(p => p.title !== 'Invoice Template')
+    .sort((a, b) => b.index - a.index);
+
+  let createNewSheet = needsNewInvoice(monthSheets);
+  let targetSheetTitle = createNewSheet ? null : monthSheets[0]?.title;
+  let targetSheetId = createNewSheet ? null : monthSheets[0]?.sheetId;
+
+  if (createNewSheet) {
+    const result = await createNewInvoiceSheet(sheets, sheetsList, spreadsheetId);
+    targetSheetId = result.sheetId;
+    targetSheetTitle = result.sheetTitle;
   }
+
+  // Get existing data from the target sheet
+  const dataResponse = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${targetSheetTitle}!A1:H400`
+  });
+  const existingData = dataResponse.data.values || [];
+
+  // Find the next available row and NO. value
+  const { rowIndex, nextNoValue } = findNextRowAndNumber(existingData, createNewSheet);
+
+  // Add the new entry to the sheet
+  await addEntryToSheet(
+    sheets,
+    spreadsheetId,
+    targetSheetTitle,
+    rowIndex,
+    nextNoValue,
+    cameraJumpInfo
+  );
+
+  return {
+    success: true,
+    sheetStatus: createNewSheet ? 'created' : 'updated',
+    sheetTitle: targetSheetTitle,
+    noValue: nextNoValue,
+    message: createNewSheet
+      ? `Created new invoice sheet "${targetSheetTitle}" and added entry with NO. ${nextNoValue}`
+      : `Updated invoice in existing sheet "${targetSheetTitle}" with NO. ${nextNoValue}`
+  };
 }
 
 /**
@@ -89,31 +73,16 @@ async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
  * @returns {boolean} Whether a new invoice is needed
  */
 function needsNewInvoice(monthSheets) {
-  // If no sheets exist yet, we definitely need one
   if (monthSheets.length === 0) return true;
-  
   const current = new Date();
-  const currentMonth = current.getMonth();
-  const currentYear = current.getFullYear();
-  
-  // Check if most recent sheet is from current month/year
-  const mostRecentSheetTitle = monthSheets[0].title;
-  // Assuming title format is like "March_2025"
-  const [sheetMonth, sheetYear] = mostRecentSheetTitle.split('_');
+  const [sheetMonth, sheetYear] = monthSheets[0].title.split('_');
   const sheetMonthIndex = new Date(`${sheetMonth} 1, ${sheetYear}`).getMonth();
   const sheetYearNum = parseInt(sheetYear);
-  
-  // If the most recent sheet is from a previous month/year, we need a new one
-  if (sheetYearNum < currentYear || (sheetYearNum === currentYear && sheetMonthIndex < currentMonth)) {
+  if (sheetYearNum < current.getFullYear() || (sheetYearNum === current.getFullYear() && sheetMonthIndex < current.getMonth())) {
     return true;
   }
-  
-  // Check if we've passed the last Sunday of the current month
-  const lastSundayOfMonth = getLastSundayOfMonth(currentYear, currentMonth);
-  
-  // If today is after the last Sunday of the month, and we're still in the same month as the sheet,
-  // then we need a new sheet for the next month
-  return current > lastSundayOfMonth && currentMonth === sheetMonthIndex;
+  const lastSunday = getLastSundayOfMonth(current.getFullYear(), current.getMonth());
+  return current > lastSunday && current.getMonth() === sheetMonthIndex;
 }
 
 /**
@@ -143,62 +112,41 @@ function getLastSundayOfMonth(year, month) {
  */
 async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
   // Determine the month and year for the new sheet
-  const nextMonth = new Date();
-  const current = new Date();
-  const lastSundayOfMonth = getLastSundayOfMonth(nextMonth.getFullYear(), nextMonth.getMonth());
-  
-  // If today is after the last Sunday, use the next month for the new sheet
-  if (current > lastSundayOfMonth) {
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-  }
-  
+  const now = new Date();
+  const lastSunday = getLastSundayOfMonth(now.getFullYear(), now.getMonth());
+  const nextMonth = new Date(now);
+  if (now > lastSunday) nextMonth.setMonth(nextMonth.getMonth() + 1);
   const newSheetTitle = `${nextMonth.toLocaleString('default', { month: 'long' })}_${nextMonth.getFullYear()}`;
-  
+
   // Find the template sheet
-  const templateSheet = sheetsList
-    .map(sheet => sheet.properties)
-    .find(properties => properties.title === 'Invoice Template');
-  
-  if (!templateSheet) {
-    throw new Error('Template sheet not found');
-  }
-  
+  const templateSheet = sheetsList.map(sheet => sheet.properties).find(p => p.title === 'Invoice Template');
+  if (!templateSheet) throw new Error('Template sheet not found');
+
   // Duplicate the template sheet
   const duplicateResponse = await sheets.spreadsheets.batchUpdate({
-    spreadsheetId: spreadsheetId,
+    spreadsheetId,
     resource: {
-      requests: [
-        {
-          duplicateSheet: {
-            sourceSheetId: templateSheet.sheetId,
-            insertSheetIndex: sheetsList.length,
-            newSheetName: newSheetTitle
-          }
+      requests: [{
+        duplicateSheet: {
+          sourceSheetId: templateSheet.sheetId,
+          insertSheetIndex: sheetsList.length,
+          newSheetName: newSheetTitle
         }
-      ]
+      }]
     }
   });
-  
   const newSheetId = duplicateResponse.data.replies[0].duplicateSheet.properties.sheetId;
-  
+
   // Update invoice date with the last Sunday of this new month
   const invoiceDate = getLastSundayOfMonth(nextMonth.getFullYear(), nextMonth.getMonth());
-  const formattedInvoiceDate = `${invoiceDate.getDate()}/${invoiceDate.getMonth() + 1}/${invoiceDate.getFullYear()}`;
-  
-  // Update the DATE field in the template
+  const formattedInvoiceDate = formatDate(invoiceDate);
   await sheets.spreadsheets.values.update({
-    spreadsheetId: spreadsheetId,
-    range: `${newSheetTitle}!B4`, // DATE: field
+    spreadsheetId,
+    range: `${newSheetTitle}!B4`,
     valueInputOption: 'USER_ENTERED',
-    resource: {
-      values: [[formattedInvoiceDate]]
-    }
+    resource: { values: [[formattedInvoiceDate]] }
   });
-  
-  return {
-    sheetId: newSheetId,
-    sheetTitle: newSheetTitle
-  };
+  return { sheetId: newSheetId, sheetTitle: newSheetTitle };
 }
 
 /**
@@ -208,34 +156,17 @@ async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
  * @returns {Object} The row index and next invoice number
  */
 function findNextRowAndNumber(existingData, createNewSheet) {
-  let lastRowIndex = 18; // Default starting row (based on template)
-  
+  // Start at row 18 (template default)
+  let lastRowIndex = 18;
+  let lastNoValue = createNewSheet ? 0 : 1;
   for (let i = 18; i < existingData.length; i++) {
-    if (existingData[i] && existingData[i][2]) { 
-      lastRowIndex = i + 1;
-    }
-  }
-  
-  // Find the last NO. value to determine the next one
-  let lastNoValue = createNewSheet ? 0 : 1; // Start with 1 if no previous entries
-  
-  // Scan through existing data to find the highest NO. value
-  for (let i = 15; i < existingData.length; i++) {
+    if (existingData[i] && existingData[i][2]) lastRowIndex = i + 1;
     if (existingData[i] && existingData[i][0]) {
       const noValue = parseInt(existingData[i][0]);
-      if (!isNaN(noValue) && noValue >= lastNoValue) {
-        lastNoValue = noValue;
-      }
+      if (!isNaN(noValue) && noValue >= lastNoValue) lastNoValue = noValue;
     }
   }
-  
-  // Increment the NO. value for the new entry
-  const nextNoValue = lastNoValue + 1;
-  
-  return {
-    rowIndex: lastRowIndex + 1,
-    nextNoValue
-  };
+  return { rowIndex: lastRowIndex + 1, nextNoValue: lastNoValue + 1 };
 }
 
 /**
@@ -248,19 +179,14 @@ function findNextRowAndNumber(existingData, createNewSheet) {
  * @param {Object} cameraJumpInfo - Information about the camera jump
  */
 async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noValue, cameraJumpInfo) {
-  // Format the date as DD/MM/YYYY
-  const jumpDate = new Date(cameraJumpInfo.date);
-  const formattedDate = `${jumpDate.getDate()}/${jumpDate.getMonth() + 1}/${jumpDate.getFullYear()}`;
-  
-  // Update the sheet with the new entry
   await sheets.spreadsheets.values.batchUpdate({
-    spreadsheetId: spreadsheetId,
+    spreadsheetId,
     resource: {
       valueInputOption: 'USER_ENTERED',
       data: [{
         range: `${sheetTitle}!A${rowIndex}:C${rowIndex}`,
         values: [
-          [noValue, formattedDate, cameraJumpInfo.studentName] // NO., DATE, CUSTOMER
+          [noValue, formatDate(cameraJumpInfo.date), cameraJumpInfo.studentName]
         ]
       }]
     }
@@ -276,21 +202,11 @@ async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noVa
 export async function updateCameraInvoice(cameraJumpInfo, spreadsheetId) {
   try {
     const sheets = await initGoogleSheets();
-    
-    const result = await findAndUpdateInvoice(
-      sheets,
-      cameraJumpInfo,
-      spreadsheetId,
-    );
-    
+    const result = await findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId);
     console.log(result.message);
     return result;
-    
   } catch (error) {
     console.error('Error in updateCameraInvoice:', error);
-    return {
-      success: false,
-      message: `Error in updateCameraInvoice: ${error.message}`
-    };
+    return { success: false, message: `Error in updateCameraInvoice: ${error.message}` };
   }
 }

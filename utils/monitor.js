@@ -6,6 +6,7 @@ import { shutdown } from './shutdown.js';
 import { EventEmitter } from 'events';
 import readline from 'readline'; 
 import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
+import { updateMoneyEarnt } from '../spreadsheets/updateMoneyEarnt.js';
 
 dotenv.config();
 
@@ -24,37 +25,36 @@ const createConfig = env => ({
 });
 
 // Side effect: Handle new jump detection
-export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => async (jumpData) => {
+export const handleNewJump = (processedLoads = new Set()) => async (jumpData) => {
+    const config = createConfig(process.env);
+
     if (!jumpData || processedLoads.has(jumpData.loadId)) {
-        return { processedLoads, cameraCount };
+        return { processedLoads };
     }
 
     try {
-        await updateLogbook(jumpData.jump, process.env.LOGBOOK_SPREADSHEET_ID);
-        console.log('Logbook updated', jumpData);
-        
-        // Emit state updates
+        await updateLogbook(jumpData.jump, config.logbookSpreadsheetId);
+        console.log('Logbook updated');
+
         stateEmitter.emit('loadProcessed', jumpData.loadId);
         if (jumpData.isCamera) {
             stateEmitter.emit('cameraJumpAdded');
-
             const cameraJumpInfo = {
                 date: new Date(),
                 studentName: jumpData.studentName
-            }
-
+            };
             console.log('Updating camera invoice...');
-
-            updateCameraInvoice(cameraJumpInfo, process.env.INVOICE_SPREADSHEET_ID)
+            updateCameraInvoice(cameraJumpInfo, config.invoiceSpreadsheetId);
+            // Immediately update money earnt for each camera jump
+            updateMoneyEarnt(config.moneyEarntSpreadsheetId, 1);
         }
 
         return {
-            processedLoads: new Set([...processedLoads, jumpData.loadId]),
-            cameraCount: jumpData.isCamera ? cameraCount + 1 : cameraCount
+            processedLoads: new Set([...processedLoads, jumpData.loadId])
         };
     } catch (error) {
         console.error('Error processing jump:', error);
-        return { processedLoads, cameraCount };
+        return { processedLoads };
     }
 };
 
@@ -62,7 +62,6 @@ export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => as
 export const monitorBurble = async () => {
     const config = createConfig(process.env);
     let processedLoads = new Set();
-    let cameraCount = 0;
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -94,11 +93,8 @@ export const monitorBurble = async () => {
             const data = JSON.parse(responseBody);
 
             const jumpData = processJumpData(data, config);
-            const newState = await handleNewJump(processedLoads, cameraCount)(jumpData);
-
-            // Update state values
+            const newState = await handleNewJump(processedLoads)(jumpData);
             processedLoads = newState.processedLoads;
-            cameraCount = newState.cameraCount;
 
             // Delay processing new responses for 60 seconds
             await new Promise(resolve => setTimeout(resolve, 60000));
@@ -116,12 +112,6 @@ export const monitorBurble = async () => {
 
     // Handle shutdown
     const shutdownHandler = async () => {
-        if(cameraCount == 0 ){
-            await browser.close();
-            console.log('No camera jumps to add')
-            return
-        }
-        await shutdown(config.moneyEarntSpreadsheetId, cameraCount);
         await browser.close();
     };
 
@@ -138,17 +128,13 @@ export const monitorBurble = async () => {
     }
 
     process.on("SIGINT", async () => {
-        console.log( 'Shutting down...');
         await shutdownHandler();
-        console.log('Exiting now...');
         process.exit(0); 
     });
 
     process.on('message', async (msg) => {
         if(msg === 'shutdown'){
-            console.log( 'Shutting down...');
             await shutdownHandler();
-            console.log('Exiting now...');
 
             setTimeout(function() {
                 process.exit(0)
@@ -157,16 +143,12 @@ export const monitorBurble = async () => {
     })
 
     process.on('SIGTERM', async () => {
-        console.log( 'SIGTERM Shutting down...');
         await shutdownHandler();
-        console.log('Exiting now...');
         process.exit(0);
     });
 
     process.on('SIGBREAK', async () => {
-        console.log( 'SIGBREAK Shutting down...');
         await shutdownHandler();
-        console.log('Exiting now...');
         process.exit(0);
     });
 

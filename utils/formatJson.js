@@ -6,19 +6,15 @@ const checkName = (name, loads) => {
     for (let load of loads) {
         // Skip empty loads
         if (!load.groups) continue;
-        
-        // Ensure time is less than 1 minute to avoid pointless log due to weather holds etc
-        if (load.time_left < 1) {            
-            // Iterate through each group in the load
+
+        // Ensure time is less than 2 minutes to avoid pointless log due to weather holds etc
+        if (load.time_left < 2) {
             for (let group of load.groups) {
-                // Iterate through each jumper in the group
                 for (let jumper of group) {                    
                     if (jumper.name === name) {
                         let jumpType = jumper.jump;
                         const sale_id = jumper.sale_id
 
-                        console.log('Sale ID:', sale_id);
-                        console.log('Group Sale ID:', group[0].sale_id);
 
                         let studentName = '';
                         if(jumpType === 'VID'){
