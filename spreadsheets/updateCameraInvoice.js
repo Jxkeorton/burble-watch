@@ -208,12 +208,10 @@ async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
  * @returns {Object} The row index and next invoice number
  */
 function findNextRowAndNumber(existingData, createNewSheet) {
-  // Find the row where we need to add data (after the last entry)
   let lastRowIndex = 18; // Default starting row (based on template)
   
-  // Find the last row with data in the student name column (now column C, index 2)
   for (let i = 18; i < existingData.length; i++) {
-    if (existingData[i] && existingData[i][2]) { // Column C (index 2) is CUSTOMER/Student Name
+    if (existingData[i] && existingData[i][2]) { 
       lastRowIndex = i + 1;
     }
   }
@@ -223,7 +221,7 @@ function findNextRowAndNumber(existingData, createNewSheet) {
   
   // Scan through existing data to find the highest NO. value
   for (let i = 15; i < existingData.length; i++) {
-    if (existingData[i] && existingData[i][0]) { // Column A (index 0) is NO.
+    if (existingData[i] && existingData[i][0]) {
       const noValue = parseInt(existingData[i][0]);
       if (!isNaN(noValue) && noValue >= lastNoValue) {
         lastNoValue = noValue;

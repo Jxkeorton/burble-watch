@@ -17,12 +17,16 @@ const checkName = (name, loads) => {
                         let jumpType = jumper.jump;
                         const sale_id = jumper.sale_id
 
+                        console.log('Sale ID:', sale_id);
+                        console.log('Group Sale ID:', group[0].sale_id);
+
                         let studentName = '';
                         if(jumpType === 'VID'){
                             if (sale_id === group[0].sale_id){
                                 studentName = group[0].name;
+                                console.log('Student Name:', studentName);
                             } else {
-                                jumpType = 'Camera'
+                                jumpType = 'VID'
                             }
                         }
 

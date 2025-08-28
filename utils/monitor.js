@@ -31,7 +31,7 @@ export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => as
 
     try {
         await updateLogbook(jumpData.jump, process.env.LOGBOOK_SPREADSHEET_ID);
-        console.log('Logbook updated');
+        console.log('Logbook updated', jumpData);
         
         // Emit state updates
         stateEmitter.emit('loadProcessed', jumpData.loadId);
@@ -42,6 +42,8 @@ export const handleNewJump = (processedLoads = new Set(), cameraCount = 0) => as
                 date: new Date(),
                 studentName: jumpData.studentName
             }
+
+            console.log('Updating camera invoice...');
 
             updateCameraInvoice(cameraJumpInfo, process.env.INVOICE_SPREADSHEET_ID)
         }

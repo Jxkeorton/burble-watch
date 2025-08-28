@@ -44,7 +44,7 @@ const jsonData = {
                         "formation_type_id": "0",
                         "rig_id": "0",
                         "team_id": "0",
-                        "sale_id": "183306",
+                        "sale_id": "1833062",
                         "team_name": "",
                         "formation_type_name": "",
                         "rig_name": "",
@@ -484,7 +484,7 @@ const createConfig = env => ({
     invoiceSpreadsheetId: env.INVOICE_SPREADSHEET_ID
 });
 
-const mockFunction = async () => {
+const runTest = async () => {
     const config = createConfig(process.env);
 
     let processedLoads = new Set();
@@ -498,4 +498,4 @@ const mockFunction = async () => {
     cameraCount = newState.cameraCount;
 }
 
-mockFunction();
+runTest();
