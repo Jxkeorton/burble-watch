@@ -1,8 +1,8 @@
-import { monitorBurble } from './utils/monitor.js';
+import { checkBurble } from './utils/monitor.js';
 
 const main = async () => {
     try {
-        const stateEmitter = await monitorBurble();
+        const stateEmitter = await checkBurble();
 
         // Listen for processed jump updates
         stateEmitter.on('loadProcessed', (loadId) => {
