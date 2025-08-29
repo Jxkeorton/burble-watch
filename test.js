@@ -1,8 +1,5 @@
 import { processJumpData } from "./utils/formatJson.js";
 import { handleNewJump } from "./utils/monitor.js";
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const jsonData = {
     "queries": 6,
@@ -474,23 +471,12 @@ const jsonData = {
     "operation_time": "27.125835418701ms"
 };
 
-const createConfig = env => ({
-    jumpersName: env.JUMPERS_NAME,
-    canopy: env.CANOPY,
-    dzId: env.DZ_ID,
-    description: env.DESCRIPTION,
-    logbookSpreadsheetId: env.LOGBOOK_SPREADSHEET_ID,
-    moneyEarntSpreadsheetId: env.MONEY_EARNT_SPREADSHEET_ID,
-    invoiceSpreadsheetId: env.INVOICE_SPREADSHEET_ID
-});
-
 const runTest = async () => {
-    const config = createConfig(process.env);
 
     let processedLoads = new Set();
     let cameraCount = 0;
 
-    const jumpData = processJumpData(jsonData, config);
+    const jumpData = processJumpData(jsonData);
     const newState = await handleNewJump(processedLoads, cameraCount)(jumpData);
 
     // Update state values

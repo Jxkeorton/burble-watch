@@ -3,7 +3,6 @@ Running this script will monitor burble, once your name appears on a load it wil
 
 ## Step 1 
 - Pull code from repo
-- Use config within monitor.js to create .env file 
 
 ## Step 2 - Google cloud console
 - Create google cloud console project 

@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const convertTimestampToDateString = (timestamp) => {
     return new Date(timestamp * 1000).toISOString().split('T')[0];
 };
@@ -7,8 +11,8 @@ const checkName = (name, loads) => {
         // Skip empty loads
         if (!load.groups) continue;
 
-        // Ensure time is less than 2 minutes to avoid pointless log due to weather holds etc
-        if (load.time_left < 2) {
+        // Ensure time is less than 3 minutes to avoid pointless log due to weather holds etc
+        if (load.time_left < 3) {
             for (let group of load.groups) {
                 for (let jumper of group) {                    
                     if (jumper.name === name) {
@@ -59,9 +63,10 @@ const formatData = (loadData, canopy, DZID, description, jumpType) => {
     return newJump;
 };
 
-const processJumpData = (responseData, config) => {
+const processJumpData = (responseData) => {
     const loads = Array.isArray(responseData.loads) ? responseData.loads : [];
-    const result = checkName(config.jumpersName, loads);
+
+    const result = checkName(process.env.JUMPERS_NAME, loads);
 
     if (!result) {
         return null;
@@ -72,9 +77,9 @@ const processJumpData = (responseData, config) => {
     return {
         jump: formatData(
             loadData, 
-            config.canopy, 
-            config.dzId, 
-            config.description, 
+            process.env.CANOPY, 
+            process.env.DZ_ID, 
+            process.env.DESCRIPTION, 
             jumpType
         ),
         loadId: loadData.id,

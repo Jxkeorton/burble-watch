@@ -50,5 +50,6 @@ export async function updateCookie(dzid) {
   return cookies[dzid].cookie;
 }
   
-const cookies = updateCookie(531);
-console.log(cookies);
+// Test (uncomment and run)
+// const cookies = updateCookie(531);
+// console.log(cookies);

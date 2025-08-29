@@ -1,20 +1,17 @@
-import { checkBurble } from './utils/monitor.js';
 
-const main = async () => {
+import { scrapeAndUpdate } from './utils/monitor.js';
+
+const runInterval = 60 * 1000; // 1 minute
+
+// Fetches manifest data and updates relevant sheets
+const runScrapeAndUpdate = async () => {
     try {
-        const stateEmitter = await checkBurble();
-
-        // Listen for processed jump updates
-        stateEmitter.on('loadProcessed', (loadId) => {
-            console.log(`Load processed: ${loadId}`);
-        });
-
-        stateEmitter.on('cameraJumpAdded', () => {
-            console.log(`A camera jump was added.`);
-        });
+        await scrapeAndUpdate();
     } catch (error) {
-        console.error('Error starting monitoring:', error);
+        console.error('Error while monitoring: ', error);
     }
 };
 
-main();
+// Run immediately, then every minute
+runScrapeAndUpdate();
+setInterval(runScrapeAndUpdate, runInterval);

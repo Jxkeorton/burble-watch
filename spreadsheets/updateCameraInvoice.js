@@ -7,13 +7,6 @@ function formatDate(date) {
   return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 }
 
-/**
- * Finds the appropriate sheet and updates it with new invoice information
- * @param {Object} sheets - Google Sheets API client
- * @param {Object} cameraJumpInfo - Information about the camera jump
- * @param {string} spreadsheetId - ID of the target spreadsheet
- * @returns {Object} Result of the operation
- */
 async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
   // Get all sheets in the spreadsheet
   const response = await sheets.spreadsheets.get({
@@ -67,11 +60,6 @@ async function findAndUpdateInvoice(sheets, cameraJumpInfo, spreadsheetId) {
   };
 }
 
-/**
- * Determines if a new invoice sheet is needed
- * @param {Array} monthSheets - List of existing month sheets
- * @returns {boolean} Whether a new invoice is needed
- */
 function needsNewInvoice(monthSheets) {
   if (monthSheets.length === 0) return true;
   const current = new Date();
@@ -85,12 +73,6 @@ function needsNewInvoice(monthSheets) {
   return current > lastSunday && current.getMonth() === sheetMonthIndex;
 }
 
-/**
- * Gets the last Sunday of a given month
- * @param {number} year - The year
- * @param {number} month - The month (0-11)
- * @returns {Date} The date of the last Sunday
- */
 function getLastSundayOfMonth(year, month) {
   const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
   let lastSunday = new Date(year, month, lastDayOfMonth);
@@ -103,13 +85,6 @@ function getLastSundayOfMonth(year, month) {
   return lastSunday;
 }
 
-/**
- * Creates a new invoice sheet based on the template
- * @param {Object} sheets - Google Sheets API client
- * @param {Array} sheetsList - List of all sheets
- * @param {string} spreadsheetId - ID of the target spreadsheet
- * @returns {Object} Information about the created sheet
- */
 async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
   // Determine the month and year for the new sheet
   const now = new Date();
@@ -149,12 +124,6 @@ async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
   return { sheetId: newSheetId, sheetTitle: newSheetTitle };
 }
 
-/**
- * Finds the next available row and invoice number
- * @param {Array} existingData - Existing data in the sheet
- * @param {boolean} createNewSheet - Whether a new sheet was created
- * @returns {Object} The row index and next invoice number
- */
 function findNextRowAndNumber(existingData, createNewSheet) {
   // Start at row 18 (template default)
   let lastRowIndex = 18;
@@ -169,15 +138,6 @@ function findNextRowAndNumber(existingData, createNewSheet) {
   return { rowIndex: lastRowIndex + 1, nextNoValue: lastNoValue + 1 };
 }
 
-/**
- * Adds a new entry to the specified sheet
- * @param {Object} sheets - Google Sheets API client
- * @param {string} spreadsheetId - ID of the target spreadsheet
- * @param {string} sheetTitle - Title of the target sheet
- * @param {number} rowIndex - Row index for the new entry
- * @param {number} noValue - Invoice number for the new entry
- * @param {Object} cameraJumpInfo - Information about the camera jump
- */
 async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noValue, cameraJumpInfo) {
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId,
@@ -193,12 +153,7 @@ async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noVa
   });
 }
 
-/**
- * Updates a camera invoice with the provided information
- * @param {Object} cameraJumpInfo - Information about the camera jump
- * @param {string} spreadsheetId - ID of the target spreadsheet
- * @returns {Object} Result of the operation
- */
+// main function 
 export async function updateCameraInvoice(cameraJumpInfo, spreadsheetId) {
   try {
     const sheets = await initGoogleSheets();

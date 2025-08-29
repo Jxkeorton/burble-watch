@@ -7,44 +7,31 @@ import readline from 'readline';
 import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
 import { updateMoneyEarnt } from '../spreadsheets/updateMoneyEarnt.js';
 import { burblequery } from "../api-calls/getLoads.js";
+import { updateCookie } from "../api-calls/getCookie.js";
+
+let processedLoads = new Set();
 
 dotenv.config();
 
-// State updates through event emitter
-const stateEmitter = new EventEmitter();
-
-export const createConfig = env => ({
-    jumpersName: env.JUMPERS_NAME,
-    canopy: env.CANOPY,
-    dzId: env.DZ_ID,
-    description: env.DESCRIPTION,
-    logbookSpreadsheetId: env.LOGBOOK_SPREADSHEET_ID,
-    moneyEarntSpreadsheetId: env.MONEY_EARNT_SPREADSHEET_ID,
-    invoiceSpreadsheetId: env.INVOICE_SPREADSHEET_ID
-});
-
-const config = createConfig(process.env);
-
-export const handleNewJump = (processedLoads = new Set()) => async (jumpData) => {
+export const handleNewJump = (processedLoads) => async (jumpData) => {
     if (!jumpData || processedLoads.has(jumpData.loadId)) {
         return { processedLoads };
     }
 
     try {
-        await updateLogbook(jumpData.jump, config.logbookSpreadsheetId);
+        await updateLogbook(jumpData.jump, process.env.LOGBOOK_SPREADSHEET_ID);
         console.log('Logbook updated');
 
-        stateEmitter.emit('loadProcessed', jumpData.loadId);
         if (jumpData.isCamera) {
-            stateEmitter.emit('cameraJumpAdded');
             const cameraJumpInfo = {
                 date: new Date(),
                 studentName: jumpData.studentName
             };
             console.log('Updating camera invoice...');
-            updateCameraInvoice(cameraJumpInfo, config.invoiceSpreadsheetId);
-            // Immediately update money earnt for each camera jump
-            updateMoneyEarnt(config.moneyEarntSpreadsheetId, 1);
+
+            // Update invoice and money earnt google sheets 
+            updateCameraInvoice(cameraJumpInfo, process.env.INVOICE_SPREADSHEET_ID);
+            updateMoneyEarnt(process.env.MONEY_EARNT_SPREADSHEET_ID, 1);
         }
 
         return {
@@ -56,12 +43,17 @@ export const handleNewJump = (processedLoads = new Set()) => async (jumpData) =>
     }
 };
 
-export const checkBurble = async () => {
-    const data = await burblequery(config);
+export const scrapeAndUpdate = async () => {
+    const cookie = await updateCookie(process.env.DZ_ID);
+    const data = await burblequery(cookie);
 
-    const jumpData = processJumpData(data, config);
-    const newState = await handleNewJump(processedLoads)(jumpData);
-    processedLoads = newState.processedLoads;
+    console.log("Processed Loads: ", processedLoads);
 
-    return stateEmitter;
+    try {
+        const jumpData = processJumpData(data);
+        const newState = await handleNewJump(processedLoads)(jumpData);
+        processedLoads = newState.processedLoads;
+    } catch (error) {
+        throw error;
+    }
 };

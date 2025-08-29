@@ -1,19 +1,7 @@
 import fetch from 'node-fetch';
-import fs from 'fs';
-import {createConfig} from "../utils/monitor.js";
 
-async function readCookie() {
-  const cookiesPath = './cookies.json';
-  if (fs.existsSync(cookiesPath)) {
-    const cookies = JSON.parse(fs.readFileSync(cookiesPath, 'utf8'));
-    return cookies[531]?.cookie || null;
-  }
-  return null;
-}
-
-export async function burblequery(config) {
-  const dzid = config.dzId;
-  const cookie = await readCookie();
+export async function burblequery(cookie) {
+  const dzid = process.env.DZ_ID;
 
   const url = 'https://dzm.burblesoft.com/ajax_dzm2_frontend_jumpermanifestpublic';
   const headers = {
@@ -39,6 +27,7 @@ export async function burblequery(config) {
     body: payload
   });
   const text = await response.text();
+
   try {
     return JSON.parse(text);
   } catch (e) {
@@ -46,6 +35,6 @@ export async function burblequery(config) {
     throw e;
   }
 }
-
-const loads = await burblequery();
-console.log(loads);
+// Test 
+// const data = await burblequery();
+// console.log(data);
