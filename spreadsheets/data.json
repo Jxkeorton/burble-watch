@@ -1,0 +1,11 @@
+{
+    "invoice": {
+        "month-work-jumps": 0,
+        "month-total": 0,
+        "last-students-name": ""
+    },
+    "logbook-analytics": {
+        "total-jumps": 0,
+        "total-jumps-today": 0
+    }
+}

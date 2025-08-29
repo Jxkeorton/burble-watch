@@ -1,5 +1,6 @@
 
 import { initGoogleSheets } from '../utils/initGoogleSheets.js';
+import { updateJsonValue } from './updateData.js';
 
 // Utility: Format date as DD/MM/YYYY
 function formatDate(date) {
@@ -135,10 +136,15 @@ function findNextRowAndNumber(existingData, createNewSheet) {
       if (!isNaN(noValue) && noValue >= lastNoValue) lastNoValue = noValue;
     }
   }
+
   return { rowIndex: lastRowIndex + 1, nextNoValue: lastNoValue + 1 };
 }
 
 async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noValue, cameraJumpInfo) {
+  updateJsonValue(['invoice', 'month-work-jumps'], noValue);
+  updateJsonValue(['invoice', 'month-total'], noValue * 40);
+  updateJsonValue(['invoice', 'last-students-name'], cameraJumpInfo.studentName);
+
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId,
     resource: {

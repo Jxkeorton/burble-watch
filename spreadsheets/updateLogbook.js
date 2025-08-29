@@ -1,4 +1,5 @@
 import { initGoogleSheets } from '../utils/initGoogleSheets.js';
+import { updateJsonValue } from './updateData.js';
 
 async function getLastJumpNumber(sheets, spreadsheetId) {
     const response = await sheets.spreadsheets.values.get({
@@ -12,7 +13,19 @@ async function getLastJumpNumber(sheets, spreadsheetId) {
     return isNaN(lastJumpNo) ? 0 : lastJumpNo;
 }
 
-async function updateLogbook(newJump, spreadsheetId) {
+async function getTodaysJumps(sheets, spreadsheetId) {
+    const response = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: "'Logbook'!A2:G",
+        valueRenderOption: 'UNFORMATTED_VALUE',
+        majorDimension: 'ROWS'
+    });
+    const values = response.data.values || [];
+    const today = new Date().toLocaleDateString();
+    return values.filter(row => row[0] === today).length;
+}
+
+export async function updateLogbook(newJump, spreadsheetId) {
     try {
         // Inline validation
         const required = ['date', 'dz', 'planeName', 'canopy'];
@@ -21,7 +34,11 @@ async function updateLogbook(newJump, spreadsheetId) {
 
         const sheets = await initGoogleSheets();
         const lastJumpNo = await getLastJumpNumber(sheets, spreadsheetId);
+        const todaysJumps = await getTodaysJumps(sheets, spreadsheetId);
         const newJumpNo = lastJumpNo + 1;
+        updateJsonValue(['logbook-analytics', 'total-jumps'], newJumpNo);
+        updateJsonValue(['logbook-analytics', 'total-jumps-today'], todaysJumps + 1);
+
         const formattedData = [
             newJump.date,
             newJump.dz,
@@ -43,5 +60,3 @@ async function updateLogbook(newJump, spreadsheetId) {
         return false;
     }
 }
-
-export { updateLogbook };
