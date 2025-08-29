@@ -143,7 +143,6 @@ function findNextRowAndNumber(existingData, createNewSheet) {
 async function addEntryToSheet(sheets, spreadsheetId, sheetTitle, rowIndex, noValue, cameraJumpInfo) {
   updateJsonValue(['invoice', 'month-work-jumps'], noValue);
   updateJsonValue(['invoice', 'month-total'], noValue * 40);
-  updateJsonValue(['invoice', 'last-students-name'], cameraJumpInfo.studentName);
 
   await sheets.spreadsheets.values.batchUpdate({
     spreadsheetId,
