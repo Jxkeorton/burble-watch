@@ -1,8 +1,6 @@
 import { processJumpData } from './formatJson.js';
 import { updateLogbook } from '../spreadsheets/updateLogbook.js';
 import dotenv from 'dotenv';
-import { shutdown } from './shutdown.js';
-import { EventEmitter } from 'events';
 import { updateCameraInvoice } from '../spreadsheets/updateCameraInvoice.js';
 import { updateMoneyEarnt } from '../spreadsheets/updateMoneyEarnt.js';
 import { burblequery } from "../api-calls/getLoads.js";
