@@ -13,16 +13,15 @@ async function getLastJumpNumber(sheets, spreadsheetId) {
     return isNaN(lastJumpNo) ? 0 : lastJumpNo;
 }
 
-async function getTodaysJumps(sheets, spreadsheetId) {
+export async function getTodaysJumps(sheets, spreadsheetId) {
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId,
-        range: "'Logbook'!A2:G",
+        range: "'Analytics'!B5",
         valueRenderOption: 'UNFORMATTED_VALUE',
         majorDimension: 'ROWS'
     });
-    const values = response.data.values || [];
-    const today = new Date().toLocaleDateString();
-    return values.filter(row => row[0] === today).length;
+    const value = response.data.values ? parseInt(response.data.values[0][0]) : 0;
+    return isNaN(value) ? 0 : value;
 }
 
 export async function updateLogbook(newJump, spreadsheetId) {
@@ -60,3 +59,9 @@ export async function updateLogbook(newJump, spreadsheetId) {
         return false;
     }
 }
+
+// test get todays jumps
+// const sheets = await initGoogleSheets();
+// const spreadsheetId = '1zDM0rkzke54iwCCN-cBzJpCPh38uTLOv2xo3Nktou-0';
+// const todaysJumps = await getTodaysJumps(sheets, spreadsheetId);
+// console.log('Todays Jumps:', todaysJumps);  

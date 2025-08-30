@@ -12,7 +12,7 @@ const checkName = (name, loads) => {
         if (!load.groups) continue;
 
         // Ensure time is less than 3 minutes to avoid pointless log due to weather holds etc
-        if (load.time_left < 10) {
+        if (load.time_left < 3) {
             for (let group of load.groups) {
                 for (let jumper of group) {                    
                     if (jumper.name === name) {
