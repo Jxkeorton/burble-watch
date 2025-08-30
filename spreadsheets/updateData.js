@@ -1,7 +1,11 @@
+
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const dataFilePath = path.join(__dirname, 'data.json');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dataFilePath = path.join(__dirname, './data.json');
 
 /**
  * Updates a value in the data.json file at the specified path.

@@ -1,10 +1,10 @@
 {
     "invoice": {
-        "month-work-jumps": 0,
-        "month-total": 0
+        "month-work-jumps": 2,
+        "month-total": 80
     },
     "logbook-analytics": {
-        "total-jumps": 754,
+        "total-jumps": 755,
         "total-jumps-today": 1
     },
     "quotes": [
