@@ -1,16 +1,19 @@
 {
     "invoice": {
-        "month-work-jumps": 2,
-        "month-total": 80
+        "month-work-jumps": 4,
+        "month-total": 160
     },
     "logbook-analytics": {
-        "total-jumps": 755,
-        "total-jumps-today": 1
+        "total-jumps": 758,
+        "total-jumps-today": 4
     },
     "quotes": [
         "40 quid is 40 quid",
         "Thats BOSH that is",
         "Say LOL and move on",
-        "Are they fat ?"
+        "I'm a virgin",
+        "King of the letters game",
+        "Burning ball of death",
+        "DOOMBARRRRRRR"
     ]
 }
