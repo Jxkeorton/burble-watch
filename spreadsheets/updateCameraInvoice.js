@@ -125,7 +125,7 @@ async function createNewInvoiceSheet(sheets, sheetsList, spreadsheetId) {
   return { sheetId: newSheetId, sheetTitle: newSheetTitle };
 }
 
-function findNextRowAndNumber(existingData, createNewSheet) {
+export function findNextRowAndNumber(existingData, createNewSheet) {
   // Start at row 18 (template default)
   let lastRowIndex = 18;
   let lastNoValue = createNewSheet ? 0 : 1;

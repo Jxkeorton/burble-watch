@@ -1,6 +1,7 @@
 
 import { scrapeAndUpdate } from './utils/monitor.js';
 import { fetchTodaysJumps } from './spreadsheets/getTodaysJumps.js';
+import { fetchInvoiceJumps } from './spreadsheets/getInvoiceJumps.js';
 
 const runInterval = 60 * 1000; // 1 minute
 
@@ -16,4 +17,5 @@ const runScrapeAndUpdate = async () => {
 // Run immediately, then every minute
 runScrapeAndUpdate();
 fetchTodaysJumps();
+fetchInvoiceJumps();
 setInterval(runScrapeAndUpdate, runInterval);
